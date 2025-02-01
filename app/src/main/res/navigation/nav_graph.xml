@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/nav_green">
+
+    <fragment
+        android:id="@+id/nav_green"
+        android:name="dev.albertocaro.cursocuvalles2025.ui.post.CreatePostFragment"
+        android:label="Green"/>
+
+    <fragment
+        android:id="@+id/nav_red"
+        android:name="dev.albertocaro.cursocuvalles2025.ui.post.ListPostFragment"
+        android:label="Red"/>
+
+</navigation>
