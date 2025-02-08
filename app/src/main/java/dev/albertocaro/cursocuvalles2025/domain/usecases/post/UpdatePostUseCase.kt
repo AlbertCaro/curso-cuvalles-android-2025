@@ -7,14 +7,19 @@ import dev.albertocaro.cursocuvalles2025.domain.models.Post
 import dev.albertocaro.cursocuvalles2025.domain.usecases.auditor.RecordEventUseCase
 import javax.inject.Inject
 
-class DeletePostUseCase @Inject constructor(
+class UpdatePostUseCase @Inject constructor(
     private val repository: PostRepository,
+    private val findPostUseCase: FindPostUseCase,
     private val recordEventUseCase: RecordEventUseCase
 ) {
 
-    suspend operator fun invoke(post: Post) {
-        repository.deletePost(post)
+    suspend operator fun invoke(id: Int, title: String, content: String): Post {
+        val post = Post(id, title, content)
 
-        recordEventUseCase(Module.POST, AuditorEventType.DELETE, post.toString())
+        repository.updatePost(post)
+
+        recordEventUseCase(Module.POST, AuditorEventType.UPDATE, post.toString())
+
+        return findPostUseCase(id)
     }
 }

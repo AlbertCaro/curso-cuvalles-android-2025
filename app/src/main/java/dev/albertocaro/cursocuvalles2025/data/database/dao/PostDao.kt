@@ -5,12 +5,16 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import dev.albertocaro.cursocuvalles2025.data.database.entity.Post
 
 @Dao
 interface PostDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE) // INSERT INTO post VALUES (id, title, content)
     suspend fun insertPost(post: Post)
+
+    @Update
+    suspend fun updatePost(post: Post)
 
     @Query("SELECT * FROM posts")
     suspend fun getAllPosts(): List<Post>

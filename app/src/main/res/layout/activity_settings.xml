@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".ui.post.PostEditActivity">
+    tools:context=".ui.settings.SettingsActivity">
 
     <include
         android:id="@+id/appbar"
@@ -14,11 +14,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <include
-        android:id="@+id/form"
-        layout="@layout/post_form"
+    <ListView
+        android:id="@+id/settings_list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"/>
+        android:layout_height="match_parent"
+        />
 
 </LinearLayout>

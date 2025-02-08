@@ -14,6 +14,10 @@ class PostRepository @Inject constructor(
         postDao.insertPost(post.toEntity())
     }
 
+    suspend fun updatePost(post: Post) {
+        postDao.updatePost(post.toEntity())
+    }
+
     suspend fun getAllPosts(): List<Post> {
         return postDao.getAllPosts().map { it.toDomain() }
     }

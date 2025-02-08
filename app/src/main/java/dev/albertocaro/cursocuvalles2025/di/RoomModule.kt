@@ -8,6 +8,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import dev.albertocaro.cursocuvalles2025.data.database.AppDatabase
+import dev.albertocaro.cursocuvalles2025.data.database.dao.PostDao
 import javax.inject.Singleton
 
 @Module
@@ -24,4 +25,8 @@ object RoomModule {
     @Singleton
     @Provides
     fun providePostDao(database: AppDatabase) = database.postDao()
+
+    @Singleton
+    @Provides
+    fun provideAuditDao(database: AppDatabase) = database.auditDao()
 }

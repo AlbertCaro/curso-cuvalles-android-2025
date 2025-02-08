@@ -1,6 +1,9 @@
 package dev.albertocaro.cursocuvalles2025.ui
 
+import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -11,6 +14,7 @@ import androidx.navigation.ui.setupWithNavController
 import dagger.hilt.android.AndroidEntryPoint
 import dev.albertocaro.cursocuvalles2025.R
 import dev.albertocaro.cursocuvalles2025.databinding.ActivityMainBinding
+import dev.albertocaro.cursocuvalles2025.ui.settings.SettingsActivity
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -44,5 +48,29 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.options_menu, menu)
+
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.itemId
+
+        when (id) {
+            R.id.action_settings -> {
+                val intent = Intent(this, SettingsActivity::class.java)
+
+                startActivity(intent)
+            }
+
+            R.id.action_close -> {
+                finish()
+            }
+        }
+
+        return super.onOptionsItemSelected(item)
     }
 }

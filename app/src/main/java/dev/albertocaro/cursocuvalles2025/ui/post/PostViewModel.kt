@@ -9,6 +9,7 @@ import dev.albertocaro.cursocuvalles2025.domain.usecases.post.DeletePostUseCase
 import dev.albertocaro.cursocuvalles2025.domain.usecases.post.FindPostUseCase
 import dev.albertocaro.cursocuvalles2025.domain.usecases.post.GetPostsUseCase
 import dev.albertocaro.cursocuvalles2025.domain.usecases.post.SavePostUseCase
+import dev.albertocaro.cursocuvalles2025.domain.usecases.post.UpdatePostUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -18,7 +19,8 @@ class PostViewModel @Inject constructor(
     private val savePostUseCase: SavePostUseCase,
     private val getPostsUseCase: GetPostsUseCase,
     private val deletePostUseCase: DeletePostUseCase,
-    private val findPostUseCase: FindPostUseCase
+    private val findPostUseCase: FindPostUseCase,
+    private val updatePostUseCase: UpdatePostUseCase
 ) : ViewModel() {
     val list = MutableLiveData(emptyList<Post>())
 
@@ -47,6 +49,12 @@ class PostViewModel @Inject constructor(
     fun findPost(id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             post.postValue(findPostUseCase(id))
+        }
+    }
+
+    fun editPost(id: Int, title: String, content: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            post.postValue(updatePostUseCase(id, title, content))
         }
     }
 }
