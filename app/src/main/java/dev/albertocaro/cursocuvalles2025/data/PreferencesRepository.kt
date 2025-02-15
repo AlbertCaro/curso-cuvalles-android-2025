@@ -12,11 +12,11 @@ class PreferencesRepository @Inject constructor(
         preferencesManager.saveSoundOnAction(value)
     }
 
-    fun getSoundOnAction(): Boolean {
+    fun mustSoundOnAction(): Boolean {
         return preferencesManager.getSoundOnAction()
     }
 
     fun getSettings(): Settings {
-        return Settings(getSoundOnAction())
+        return Settings(mustSoundOnAction())
     }
 }
