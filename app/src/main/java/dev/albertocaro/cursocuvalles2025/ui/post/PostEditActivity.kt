@@ -8,9 +8,14 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import dev.albertocaro.cursocuvalles2025.R
 import dev.albertocaro.cursocuvalles2025.databinding.ActivityPostEditBinding
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -52,10 +57,28 @@ class PostEditActivity : AppCompatActivity() {
                 .show()
         }
 
-        viewModel.post.observe(this) { post ->
-            binding.form.title.setText(post.title)
-            binding.form.content.setText(post.content)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.viewUiState.collect { state ->
+                    when(state) {
+                        is PostViewUiState.Error -> {
+                        }
+                        PostViewUiState.Loading -> {
+
+                        }
+                        is PostViewUiState.Success -> {
+                            binding.form.title.setText(state.post.title)
+                            binding.form.content.setText(state.post.content)
+                        }
+                    }
+                }
+            }
         }
+
+//        viewModel.post.observe(this) { post ->
+//            binding.form.title.setText(post.title)
+//            binding.form.content.setText(post.content)
+//        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

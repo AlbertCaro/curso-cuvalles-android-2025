@@ -7,16 +7,24 @@ import dev.albertocaro.cursocuvalles2025.data.database.entity.toEntity
 import dev.albertocaro.cursocuvalles2025.di.NetworkState
 import dev.albertocaro.cursocuvalles2025.domain.models.Post
 import dev.albertocaro.cursocuvalles2025.domain.models.toDomain
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.mapLatest
 import javax.inject.Inject
 
 class PostRepository @Inject constructor(
     private val postDao: PostDao,
     private val apiService: PostApiService,
-    @NetworkState private val isConnected: Boolean
+    @NetworkState private val networkState: Flow<Boolean>
 ) {
 
     suspend fun savePost(post: Post) {
-        if (isConnected) {
+        val isConnected = networkState.firstOrNull()
+
+        if (isConnected == true) {
             apiService.createPost(post.toApi())
         }
 
@@ -24,34 +32,39 @@ class PostRepository @Inject constructor(
     }
 
     suspend fun updatePost(post: Post) {
-        if (isConnected) {
+        val isConnected = networkState.firstOrNull()
+
+        if (isConnected == true) {
             apiService.editPost(post.id!!, post.toApi())
         }
 
         postDao.updatePost(post.toEntity())
     }
 
-    suspend fun getAllPosts(): List<Post> {
-        if (isConnected) {
-            return apiService.getPosts().map { it.toDomain() }
-        }
-
-        return postDao.getAllPosts().map { it.toDomain() }
-    }
-
     suspend fun deletePost(post: Post) {
-        if (isConnected) {
+        val isConnected = networkState.firstOrNull()
+
+        if (isConnected == true) {
             apiService.deletePost(post.id!!)
         }
 
         postDao.deletePost(post.toEntity())
     }
 
-    suspend fun findPostById(id: Int): Post {
-        if (isConnected) {
-            return apiService.getPost(id).toDomain()
+    fun getAllPosts(): Flow<List<Post>> =
+        networkState.combine(postDao.getAllPosts()) { isConnected, posts ->
+            if (isConnected) {
+                apiService.getPosts().map { it.toDomain() }
+            } else {
+                posts.map { it.toDomain() }
+            }
         }
 
-        return postDao.findPost(id).toDomain()
+    fun findPostById(id: Int): Flow<Post> = networkState.mapLatest { isConnected ->
+        if (isConnected) {
+            apiService.getPost(id).toDomain()
+        } else {
+            postDao.findPost(id).first().toDomain()
+        }
     }
 }

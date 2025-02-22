@@ -5,6 +5,7 @@ import dev.albertocaro.cursocuvalles2025.domain.models.AuditorEventType
 import dev.albertocaro.cursocuvalles2025.domain.models.Module
 import dev.albertocaro.cursocuvalles2025.domain.models.Post
 import dev.albertocaro.cursocuvalles2025.domain.usecases.auditor.RecordEventUseCase
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class GetPostsUseCase @Inject constructor(
@@ -12,7 +13,7 @@ class GetPostsUseCase @Inject constructor(
     private val recordEventUseCase: RecordEventUseCase
 ) {
 
-    suspend operator fun invoke(): List<Post> {
+    suspend operator fun invoke(): Flow<List<Post>> {
         val posts = repository.getAllPosts()
 
         recordEventUseCase(Module.POST, AuditorEventType.QUERY, posts.toString())

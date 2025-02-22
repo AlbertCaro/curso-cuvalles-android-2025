@@ -11,6 +11,10 @@ import dev.albertocaro.cursocuvalles2025.domain.usecases.post.GetPostsUseCase
 import dev.albertocaro.cursocuvalles2025.domain.usecases.post.SavePostUseCase
 import dev.albertocaro.cursocuvalles2025.domain.usecases.post.UpdatePostUseCase
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,9 +26,15 @@ class PostViewModel @Inject constructor(
     private val findPostUseCase: FindPostUseCase,
     private val updatePostUseCase: UpdatePostUseCase
 ) : ViewModel() {
-    val list = MutableLiveData(emptyList<Post>())
 
-    val post = MutableLiveData<Post>()
+    private val _listUiState = MutableStateFlow<PostListUiState>(PostListUiState.Loading)
+    val listUiState: StateFlow<PostListUiState> = _listUiState
+
+    private val _viewUiState = MutableStateFlow<PostViewUiState>(PostViewUiState.Loading)
+    val viewUiState: StateFlow<PostViewUiState> = _viewUiState
+
+//    val list = MutableLiveData(emptyList<Post>())
+//    val post = MutableLiveData<Post>()
 
     fun createPost(title: String, content: String) {
         val newPost = Post(null, title, content)
@@ -35,8 +45,13 @@ class PostViewModel @Inject constructor(
     }
 
     fun fetchPosts() {
-        viewModelScope.launch(Dispatchers.IO) {
-            list.postValue(getPostsUseCase())
+        viewModelScope.launch {
+            getPostsUseCase()
+                .catch { _listUiState.value = PostListUiState.Error(it.message.orEmpty()) }
+                .flowOn(Dispatchers.IO)
+                .collect { posts ->
+                    _listUiState.value = PostListUiState.Success(posts)
+                }
         }
     }
 
@@ -48,13 +63,37 @@ class PostViewModel @Inject constructor(
 
     fun findPost(id: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            post.postValue(findPostUseCase(id))
+            findPostUseCase(id)
+                .catch { _viewUiState.value = PostViewUiState.Error(it.message.orEmpty()) }
+                .flowOn(Dispatchers.IO)
+                .collect { post ->
+                    _viewUiState.value = PostViewUiState.Success(post)
+                }
         }
     }
 
     fun editPost(id: Int, title: String, content: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            post.postValue(updatePostUseCase(id, title, content))
+            updatePostUseCase(id, title, content)
+                .catch { _viewUiState.value = PostViewUiState.Error(it.message.orEmpty()) }
+                .flowOn(Dispatchers.IO)
+                .collect { post ->
+                    _viewUiState.value = PostViewUiState.Success(post)
+                }
         }
     }
 }
+
+sealed class PostListUiState {
+    data object Loading: PostListUiState()
+    data class Success(val list: List<Post>) : PostListUiState()
+    data class Error(val message: String) : PostListUiState()
+}
+
+sealed class PostViewUiState {
+    data object Loading: PostViewUiState()
+    data class Success(val post: Post) : PostViewUiState()
+    data class Error(val message: String) : PostViewUiState()
+}
+
+

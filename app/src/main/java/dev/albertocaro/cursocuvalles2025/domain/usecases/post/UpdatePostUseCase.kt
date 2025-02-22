@@ -7,6 +7,7 @@ import dev.albertocaro.cursocuvalles2025.domain.models.Module
 import dev.albertocaro.cursocuvalles2025.domain.models.Post
 import dev.albertocaro.cursocuvalles2025.domain.usecases.auditor.RecordEventUseCase
 import dev.albertocaro.cursocuvalles2025.domain.usecases.settings.PlaySoundUseCase
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class UpdatePostUseCase @Inject constructor(
@@ -17,7 +18,7 @@ class UpdatePostUseCase @Inject constructor(
     @EditSound private val editSound: Int
 ) {
 
-    suspend operator fun invoke(id: Int, title: String, content: String): Post {
+    suspend operator fun invoke(id: Int, title: String, content: String): Flow<Post> {
         val post = Post(id, title, content)
 
         repository.updatePost(post)
